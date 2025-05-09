@@ -22,6 +22,9 @@ const NftPreview = ({ name, description, image }) => {
             </div>
           )}
 
+
+
+
           <div className="p-6">
             <h3 className="text-xl font-bold text-white mb-2 truncate">{name}</h3>
             <p className="text-gray-300 text-sm line-clamp-3">{description}</p>
