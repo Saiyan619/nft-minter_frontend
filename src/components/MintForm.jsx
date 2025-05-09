@@ -4,7 +4,7 @@ import { useReadContract, useAccount, useWriteContract, useWaitForTransactionRec
 import { parseEther, formatEther } from 'viem';
 import { contractAddress, contractAbi } from '../Constants/constant'
 import { Upload, Image as ImageIcon } from 'lucide-react';
-import NftPreview from './NftPReview';
+import NftPreview from './NftPreview';
 
 const MintForm = ({mintPrice,handleWithdraw}) => {
   const [image, setImage] = useState("")
