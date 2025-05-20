@@ -2,7 +2,7 @@ import React, {useEffect} from 'react'
 import { useAccount } from 'wagmi'
 import { parseEther, formatEther } from 'viem';
 import { Upload, Image as ImageIcon } from 'lucide-react';
-import NftPreview from './NftPReview';
+import NftPreview from './NftPreview';
 import FileErrorAlert from '../UIcomponents/FileErrorAlert';
 import { useGlobalContext } from '../utils/GlobalContext';
 import SuccessModal from '../UIcomponents/SuccessModal';
