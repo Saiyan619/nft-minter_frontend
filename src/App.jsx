@@ -6,6 +6,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { wagmiConfig } from "./utils/wagmiConfig"
 import WalletConnect from "./components/WalletConnect"
 import Home from "./homepage/Home";
+import { GlobalContext } from "./utils/GlobalContext";
 
 function App() {
 
@@ -15,12 +16,15 @@ const queryClient = new QueryClient();
   
   return (
     <WagmiProvider config={wagmiConfig}>
-            <QueryClientProvider client={queryClient}>
-      <RainbowKitProvider>
+      <QueryClientProvider client={queryClient}>
+      <GlobalContext>
+        <RainbowKitProvider>
           <Home />
-        </RainbowKitProvider>
-        </QueryClientProvider>
-    </WagmiProvider>
+          </RainbowKitProvider>
+          </GlobalContext>
+      </QueryClientProvider>
+      </WagmiProvider>
+
   )
 }
 

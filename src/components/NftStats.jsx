@@ -1,9 +1,10 @@
 import React from 'react'
+import { useGlobalContext } from '../utils/GlobalContext';
 
-const NftStats = ({maxSupply,
-  maxMintPerAddress,
-  nftMintedByAddress,
-  totalMinted}) => {
+const NftStats = () => {
+  
+  const { maxSupply, maxMintPerAddress, nftMintedByAddress, totalMinted } = useGlobalContext();
+  
     const stats = [
         { title: "Global Total Minted", value: totalMinted },
         { title: "Total NFTs", value: maxSupply },

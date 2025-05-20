@@ -1,49 +1,52 @@
-import React, {useState, useEffect} from 'react'
-import axios from 'axios'
-import { useReadContract, useAccount, useWriteContract, useWaitForTransactionReceipt } from 'wagmi'
+import React, {useEffect} from 'react'
+import { useAccount } from 'wagmi'
 import { parseEther, formatEther } from 'viem';
-import { contractAddress, contractAbi } from '../Constants/constant'
 import { Upload, Image as ImageIcon } from 'lucide-react';
-import NftPreview from './NftPreview';
+import NftPreview from './NftPReview';
+import FileErrorAlert from '../UIcomponents/FileErrorAlert';
+import { useGlobalContext } from '../utils/GlobalContext';
+import SuccessModal from '../UIcomponents/SuccessModal';
+import TnxErrorModal from '../UIcomponents/TnxErrorModal';
+import LoadingModal from '../UIcomponents/LoadingModal';
 
-const MintForm = ({mintPrice,handleWithdraw}) => {
-  const [image, setImage] = useState("")
-  const [name, setName] = useState("")
-  const [desc, setDesc] = useState("")
-  const [isLoading, setIsLoading] = useState(false);
-   const [mintSuccess, setMintSuccess] = useState(false)
+const MintForm = () => {
+  const {
+    handleMint,
+    image,
+        setImage,
+        name,
+        setName,
+        desc,
+        setDesc,
+    setIsLoading,
+    isLoading, 
+    isConfirmed, 
+    isPending,
+    isConfirming,
+    hash, 
+    writeError, 
+    confirmError,
+    handleWithdraw,
+    mintPrice,
+    ownerAddress,
+    handleOwnerMint
+  } = useGlobalContext()
+  
+
+  //  const [mintSuccess, setMintSuccess] = useState(false)
     // const [mintedTokenId, setMintedTokenId] = useState(null)
-  const [mintError, setMintError] = useState("")
+  // const [mintError, setMintError] = useState("")
 
 
     // Get connected wallet address
     const { address } = useAccount()
-  
-  
   
   const handleImageChange = (e) => {
     setImage(e.target.files[0])
     console.log(e.target.files[0])
   }
 
-
-    // Contract write hook for minting the NFT
-    const { 
-      data: hash,
-      error: writeError,
-      isPending,
-      writeContract 
-    } = useWriteContract()
-
-   // Hook for transaction step processing
-    const { 
-      isLoading: isConfirming, 
-      isSuccess: isConfirmed,
-      error: confirmError 
-    } = useWaitForTransactionReceipt({
-      hash,
-    })
-
+  //logging transaction processes for HandleMint Function
   console.log(isLoading, isConfirming, isConfirmed, hash, writeError, confirmError)
     // Monitor transaction states
 useEffect(() => {
@@ -55,182 +58,25 @@ useEffect(() => {
     writeError,
     confirmError
   })
-  
-  if (writeError) {
-    setMintError(writeError.message || "Error sending transaction")
-  }
-  
-  if (confirmError) {
-    setMintError(confirmError.message || "Error confirming transaction")
-  }
-  
-  if (isConfirmed) {
-    setMintSuccess(true)
-  }
+
 }, [isPending, isConfirming, isConfirmed, hash, writeError, confirmError])
-  const { data: ownerAddress } = useReadContract({
-    address: contractAddress,
-    abi: contractAbi,
-    functionName: 'owner',
-  })
-
-  const isOwner = ownerAddress === address
+  
+  //Check if the connected address is the contract owner
+const isOwner = ownerAddress === address
+//Log if the connected address is the contract owner
 console.log("isOwner", isOwner)  
+// console.log(ownerAddress)  
+// console.log(address)  
 
-  const handleMint = async () => {
-      if (!image || !name || !desc) {
-        console.error("Please upload an image and enter a name and description.");
-        setMintError("Please upload an image and enter a name and description.");
-        return;
-      }
-      
-      // Reset states
-      setMintError("");
-      setMintSuccess(false);
-    
-      try {
-        console.log("Starting mint process...");
-        
-        // Upload image to IPFS
-        const formData = new FormData();
-        formData.append("file", image);
-        console.log("Uploading image to IPFS...");
-        const fileResponse = await axios.post(
-          'https://api.pinata.cloud/pinning/pinFileToIPFS',
-          formData,
-          {
-            maxBodyLength: Infinity,
-            headers: {
-              'Content-Type': 'multipart/form-data',
-              pinata_api_key: import.meta.env.VITE_PINATA_API_KEY,
-              pinata_secret_api_key: import.meta.env.VITE_PINATA_SECRET_KEY,
-            },
-          }
-        );
-    
-        const imageHash = fileResponse.data.IpfsHash;
-        console.log("Image uploaded:", imageHash);
-    
-        // Upload metadata to IPFS
-        const metadata = {
-          name,
-          description: desc,
-          image: `ipfs://${imageHash}`,
-        };
-    
-        console.log("Uploading metadata to IPFS...");
-        const metadataResponse = await axios.post(
-          'https://api.pinata.cloud/pinning/pinJSONToIPFS',
-          metadata,
-          {
-            headers: {
-              pinata_api_key: import.meta.env.VITE_PINATA_API_KEY,
-              pinata_secret_api_key: import.meta.env.VITE_PINATA_SECRET_KEY,
-            },
-          }
-        );
-    
-        const metadataHash = metadataResponse.data.IpfsHash;
-        const tokenURI = `ipfs://${metadataHash}`;
-        console.log("Metadata uploaded. TokenURI:", tokenURI);
-    
-        // Call the mint function using wagmi's writeContract hook
-        console.log("Sending mint transaction to contract...");
-        writeContract({
-          address: contractAddress,
-          abi: contractAbi,
-          functionName: 'mintNFT',
-          args: [tokenURI],
-          value: mintPrice  // Make sure to include the value for payable functions
-        });
-        
-        // The transaction hash will be available in the 'hash' variable
-        // and handled by the useWaitForTransactionReceipt hook
-        console.log("Mint transaction submitted, waiting for confirmation...");
-      } catch (err) {
-        console.error("Minting failed:", err);
-        setMintError(err.message || "Error during minting process");
-      }
-    };
-
-  
-    // Prepare contract write for owner mint
-  const { writeContract: writeOwnerMint } = useWriteContract()
-  
-    const handleOwnerMint = async () => {
-      setMintError("");
-      setMintSuccess(false);
-      
-      try {
-        if (!image || !name || !desc) {
-          console.error("Please upload an image and enter a name and description.");
-          setMintError("Please upload an image and enter a name and description.");
-          return;
-        }
-        
-        console.log("Starting owner mint process...");
-        setIsLoading(isPending)
-        
-        // Upload image and metadata to IPFS (similar to handleMint)
-        const formData = new FormData();
-        formData.append("file", image);
-    
-        const fileResponse = await axios.post(
-          'https://api.pinata.cloud/pinning/pinFileToIPFS',
-          formData,
-          {
-            maxBodyLength: Infinity,
-            headers: {
-              'Content-Type': 'multipart/form-data',
-              pinata_api_key: import.meta.env.VITE_PINATA_API_KEY,
-              pinata_secret_api_key: import.meta.env.VITE_PINATA_SECRET_KEY,
-            },
-          }
-        );
-    
-        const imageHash = fileResponse.data.IpfsHash;
-        console.log("Image uploaded:", imageHash);
-        
-        const metadata = {
-          name,
-          description: desc,
-          image: `ipfs://${imageHash}`,
-        };
-    
-        const metadataResponse = await axios.post(
-          'https://api.pinata.cloud/pinning/pinJSONToIPFS',
-          metadata,
-          {
-            headers: {
-              pinata_api_key: import.meta.env.VITE_PINATA_API_KEY,
-              pinata_secret_api_key: import.meta.env.VITE_PINATA_SECRET_KEY,
-            },
-          }
-        );
-    
-        const metadataHash = metadataResponse.data.IpfsHash;
-        const tokenURI = `ipfs://${metadataHash}`;
-        console.log("Metadata uploaded. TokenURI:", tokenURI);
-        
-        // Call the ownerMint function with the correct arguments
-        console.log("Sending owner mint transaction...");
-        writeOwnerMint({
-          address: contractAddress,
-          abi: contractAbi,
-          functionName: 'ownerMint',
-          args: [address || '0xAd8915BDBa1F3fe2dbb2aFEb2da04B05313Cf9Ac', tokenURI]
-        });
-        
-        console.log("Owner mint transaction submitted, waiting for confirmation...");
-      } catch (err) {
-        console.error("Owner mint failed:", err);
-        setMintError(err.message || "Error during owner minting process");
-      }
-    };
 
 
   return (
     <div id='nft_section' className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+      {/* <button onClick={closeHandleFileErrorAlert}>testy</button> */}
+      <FileErrorAlert />
+      <SuccessModal />
+      <LoadingModal />
+      <TnxErrorModal />
       <div className=" border border-gray-600 rounded-lg p-6">
         <div className="space-y-6">
           <h2 className="text-2xl font-bold text-white mb-6">Create Your NFT</h2>
@@ -260,6 +106,7 @@ console.log("isOwner", isOwner)
               )}
             </div>
           </div>
+
 
           <div className="space-y-2">
             <label htmlFor="nftName" className="text-white block">Name</label>
