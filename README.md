@@ -46,3 +46,10 @@
 git clone https://github.com/yourusername/nft-minter.git
 cd nft-minter
 
+npm install
+
+VITE_CONTRACT_ADDRESS=your_deployed_contract_address
+VITE_INFURA_PROJECT_ID=your_infura_project_id
+
+npm run dev
+
