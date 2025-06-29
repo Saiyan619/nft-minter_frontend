@@ -1,12 +1,48 @@
-# React + Vite
+# 🖼️ NFT Minter – Web3 NFT Minting DApp
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+**NFT Minter** is a decentralized application (DApp) that allows users to connect their wallets and mint NFTs on the **Sepolia Ethereum Testnet**. Built with modern Web3 tools and a responsive UI, it offers a smooth user experience from wallet connection to successful minting.
 
-Currently, two official plugins are available:
+---
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## 🚀 Features
 
-## Expanding the ESLint configuration
+- 🔐 Connect wallet with **MetaMask** using **RainbowKit** and **wagmi**
+- 🪙 Mint NFTs directly to the Sepolia Ethereum test network
+- 🖼️ Beautiful and responsive UI built with **React**, **Tailwind CSS**, and **DaisyUI**
+- 🔍 Display minting status, transaction feedback, and wallet connection state
+- 🌐 Easily switch networks with automated prompts if the user is on the wrong chain
 
-If you are developing a production application, we recommend using TypeScript and enable type-aware lint rules. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+---
+
+## 🛠️ Tech Stack
+
+### Frontend
+- [React.js](https://reactjs.org/)
+- [Vite](https://vitejs.dev/)
+- [Tailwind CSS](https://tailwindcss.com/)
+- [DaisyUI](https://daisyui.com/)
+
+### Web3 Tools
+- [RainbowKit](https://www.rainbowkit.com/)
+- [wagmi](https://wagmi.sh/)
+- [ethers.js](https://docs.ethers.org/)
+- [MetaMask](https://metamask.io/)
+
+### Network
+- **Sepolia Ethereum Testnet**
+
+---
+
+## 📦 Installation
+
+### Prerequisites
+- Node.js & npm
+- MetaMask wallet installed in your browser
+- Access to the Sepolia Testnet (with test ETH)
+
+### 1. Clone the Repository
+
+```bash
+git clone https://github.com/yourusername/nft-minter.git
+cd nft-minter
+
